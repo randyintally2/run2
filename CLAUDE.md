@@ -300,6 +300,15 @@ Also write results/how_to_use.txt explaining in plain English:
 - Log-transformation critical for handling extreme outliers in volume features
 - Files: results/feature_separability.csv, results/scoring_rules.txt, results/confusion_matrix.txt, results/backtest_summary.txt, phase3_decision.py
 
+### Phase 4: Leave-One-Out Validation — COMPLETE (2026-04-13)
+- LOO Accuracy: 59.26% (48/81) — below 65% threshold, indicates some overfitting
+- LOO Precision: 47.22%, LOO Recall: 54.84%
+- Training vs LOO gap: 8.6% — moderate overfitting with 81 samples
+- Verdict: classifier has limited utility with current features alone
+- Improvements needed: on-chain wallet data, social signals, LP lock status, more training samples
+- The price_vs_baseline_range feature is the most robust signal that persists through LOO
+- Files: results/loo_validation.csv, results/loo_summary.txt, phase4_validation.py
+
 ## Failed Approaches
 
 ### Nansen API (Phase 0)

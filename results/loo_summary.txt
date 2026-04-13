@@ -1,0 +1,39 @@
+LEAVE-ONE-OUT VALIDATION SUMMARY
+============================================================
+
+How this test works:
+1. Remove one token from the dataset
+2. Rebuild the scoring rules from the remaining tokens
+3. Use those rules to predict the removed token
+4. Check if the prediction was correct
+5. Repeat for every token
+
+This tests whether the rules are robust or just memorizing the training data.
+If LOO accuracy is close to the training accuracy, the rules generalize well.
+If LOO accuracy is much lower, the rules are overfit.
+
+Results:
+  Accuracy:  59.26% (48 correct out of 81)
+  Precision: 47.22%
+    When the rules predicted 'winner', they were right 47% of the time.
+  Recall:    54.84%
+    Of all 31 actual winners, the rules caught 17.
+
+Confusion Matrix:
+                  Predicted Winner  Predicted Loser
+Actual Winner                   17               14
+Actual Loser                    19               31
+
+Comparison to training accuracy:
+  Training accuracy (Phase 3): 67.90%
+  LOO accuracy: 59.26%
+  Gap: 8.6% — MODERATE. Some overfitting but rules are still useful.
+
+VERDICT:
+This classifier has limited utility. 59% accuracy is below the 65% threshold.
+
+What would likely improve it:
+- On-chain data: wallet concentration, unique buyers, LP lock status
+- Social signals: Twitter/Telegram mention velocity
+- Token metadata: age, holder distribution, developer activity
+- More training data: 100+ tokens per category
