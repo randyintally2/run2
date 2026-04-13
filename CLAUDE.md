@@ -271,6 +271,17 @@ Also write results/how_to_use.txt explaining in plain English:
 - Primary data plan: Birdeye for OHLCV + discovery, DexScreener backup for discovery, Helius backup for metadata
 - Files: data/api_status.txt, phase0_api_discovery.py
 
+### Phase 1: Find Qualifying Tokens — COMPLETE (2026-04-13)
+- Winners found: 31 (target was 30-50, minimum 20) — multipliers range from 5.0x to 803.8x
+- Losers found: 50 (target was 30-50) — multipliers 1.5x-6.2x with 70-279% retracement
+- Rejected: 1497 tokens (mostly "no qualifying breakouts", "too few bars", new tokens without history)
+- Unique winner addresses: 29, unique loser addresses: 39 (2 tokens appear in both with different events)
+- Discovery sources: Birdeye token list (500 pages, 3 sort criteria), Birdeye trending, DexScreener (18 keyword searches), known token list (21 tokens)
+- Total candidates scanned: 1626
+- Data source: Birdeye OHLCV v3 (1m bars for breakout detail, 30m bars for 90-day scanning)
+- Classification criteria: Winners = 5x+ sustained (15+ minutes above 3x), Losers = 1.5x+ spike then 70%+ retrace
+- Files: data/winners.json, data/losers.json, data/manifest.csv, data/rejected_tokens.csv, phase1_collect.py
+
 ## Failed Approaches
 
 ### Nansen API (Phase 0)
@@ -281,3 +292,14 @@ Also write results/how_to_use.txt explaining in plain English:
 ### Birdeye /defi/v3/token/meta-data-single (Phase 0)
 - Returns 404 — endpoint removed or renamed
 - Resolution: Using /defi/token_overview instead (confirmed working)
+
+### Established tokens (BONK, WIF, etc.) as data sources (Phase 1)
+- Major tokens like BONK, WIF, POPCAT, FARTCOIN etc. don't show 5x+ breakouts in recent 90-day data
+- Their big runs happened months/years ago; recent price action is mature/stable
+- Resolution: Used Birdeye token list discovery (volume change sorted) to find newer tokens with recent breakouts
+- These newer tokens from pump.fun/Raydium had genuine breakout patterns in the 90-day window
+
+### Birdeye 15m initial scan approach (Phase 1)
+- First approach: single API call for 15m data only returned ~100 bars (25 hours of data)
+- Resolution: Switched to 30m bars which cover 90 days in a single call (4320 bars < 5000 limit)
+- Also discovered API returns up to 5000 bars per call (not 120 as initially assumed)
