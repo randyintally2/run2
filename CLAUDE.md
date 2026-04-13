@@ -262,7 +262,22 @@ Also write results/how_to_use.txt explaining in plain English:
 - Do not include any token in the dataset that hasn't been trading for at least 2 hours before its breakout moment.
 
 ## Progress
-(This section will be updated by the agent as it works)
+
+### Phase 0: API Discovery — COMPLETE (2026-04-13)
+- Birdeye API: WORKING — all critical endpoints confirmed (OHLCV 1m, token trending, gainers/losers, token list, search, metadata)
+- Helius API: WORKING — token metadata via DAS getAsset (no OHLCV capability)
+- DexScreener API: WORKING — free, no key needed (search, token pairs, top boosts; no OHLCV)
+- Nansen API: NOT USABLE — returns 402 Payment Required (x402 protocol needed)
+- Primary data plan: Birdeye for OHLCV + discovery, DexScreener backup for discovery, Helius backup for metadata
+- Files: data/api_status.txt, phase0_api_discovery.py
 
 ## Failed Approaches
-(This section will be updated by the agent when something doesn't work)
+
+### Nansen API (Phase 0)
+- Tried Bearer token, api-key header, x-api-key header — all return 402 Payment Required
+- Nansen requires x402 payment protocol beyond just an API key
+- Resolution: Skipping Nansen entirely, using Birdeye + DexScreener + Helius instead
+
+### Birdeye /defi/v3/token/meta-data-single (Phase 0)
+- Returns 404 — endpoint removed or renamed
+- Resolution: Using /defi/token_overview instead (confirmed working)

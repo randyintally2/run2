@@ -1,0 +1,59 @@
+API Discovery Results — 2026-04-13
+====================================
+
+BIRDEYE API — PRIMARY DATA SOURCE
+  Key: Working
+  Base URL: https://public-api.birdeye.so
+  Auth: X-API-KEY header + x-chain: solana header
+
+  Endpoints confirmed working:
+    /defi/v3/ohlcv          — 1-minute OHLCV candle data (params: address, type=1m, time_from, time_to)
+    /defi/token_trending    — Trending tokens list
+    /trader/gainers-losers  — Top gainers/losers by PnL
+    /defi/v3/token/list     — Token list sorted by volume change, liquidity, etc.
+    /defi/v3/search         — Search tokens by keyword
+    /defi/token_overview    — Token metadata (name, symbol, market cap, etc.)
+
+  Endpoints NOT working:
+    /defi/v3/ohlcv/pair            — Returns 0 bars (needs pair address not token address)
+    /defi/v3/token/meta-data-single — 404 (endpoint removed or renamed)
+
+  Rate limits: Not explicitly hit during testing.
+
+  CRITICAL FOR THIS PROJECT:
+    OHLCV 1-minute data: YES (/defi/v3/ohlcv with type=1m)
+    Token discovery: YES (/defi/v3/token/list + /defi/token_trending + /trader/gainers-losers)
+    Token metadata: YES (/defi/token_overview)
+
+HELIUS API — BACKUP FOR METADATA
+  Key: Working
+  Base URL: https://mainnet.helius-rpc.com/?api-key={KEY}
+  Auth: API key in URL query parameter
+  Method: POST (JSON-RPC 2.0)
+
+  Endpoints confirmed working:
+    getAsset — Token metadata + current price (via DAS)
+
+  Not useful for OHLCV or token discovery.
+
+DEXSCREENER API — BACKUP FOR TOKEN DISCOVERY
+  Key: Not needed (free public API)
+  Base URL: https://api.dexscreener.com
+
+  Endpoints confirmed working:
+    /latest/dex/search             — Search pairs by keyword (30 results)
+    /token-pairs/v1/solana/{addr}  — Get all pairs for a token (30 pairs)
+    /token-boosts/top/v1           — Top boosted tokens
+
+  Not useful for OHLCV candle data.
+
+NANSEN API — NOT USABLE
+  Key provided but endpoints return 402 Payment Required.
+  Requires x402 payment protocol. Skipping for all phases.
+
+SUMMARY — API USAGE PLAN FOR PHASE 1
+  1. Token discovery: Birdeye /defi/v3/token/list (sort by volume change) + /defi/token_trending
+  2. OHLCV data: Birdeye /defi/v3/ohlcv (1-minute bars, type=1m)
+  3. Token metadata: Birdeye /defi/token_overview
+  4. Backup discovery: DexScreener /latest/dex/search
+  5. Backup metadata: Helius DAS getAsset
