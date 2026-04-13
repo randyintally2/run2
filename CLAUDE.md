@@ -282,6 +282,15 @@ Also write results/how_to_use.txt explaining in plain English:
 - Classification criteria: Winners = 5x+ sustained (15+ minutes above 3x), Losers = 1.5x+ spike then 70%+ retrace
 - Files: data/winners.json, data/losers.json, data/manifest.csv, data/rejected_tokens.csv, phase1_collect.py
 
+### Phase 2: Feature Engineering — COMPLETE (2026-04-13)
+- Computed 12 features for all 81 tokens (31 winners, 50 losers, 0 skipped)
+- Most promising feature: price_vs_baseline_range (W=4.0x vs L=1.4x) — clear separation
+- Also useful: price_retracement_depth (W=0.54 vs L=0.69) — winners pull back less
+- Surprising: losers have HIGHER vol_ratio_vs_baseline (15.7x vs 6.5x) — pump schemes spike volume hard then die
+- Some features have extreme outliers (vol_acceleration) — need log transform or robust stats in Phase 3
+- tx_count_vs_baseline is useless (both ~1.0) — OHLCV data doesn't capture unique buyers
+- Files: data/features.csv, phase2_features.py
+
 ## Failed Approaches
 
 ### Nansen API (Phase 0)
