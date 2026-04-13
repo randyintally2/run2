@@ -309,6 +309,16 @@ Also write results/how_to_use.txt explaining in plain English:
 - The price_vs_baseline_range feature is the most robust signal that persists through LOO
 - Files: results/loo_validation.csv, results/loo_summary.txt, phase4_validation.py
 
+### Phase 5: Real-Time Detector — COMPLETE (2026-04-13)
+- Created detector.py — standalone Python script with hardcoded scoring rules
+- RunnerDetector class: maintains 30-min rolling baseline, detects breakout (vol>3x + new high), scores after 15 bars
+- 5 scoring rules hardcoded as constants (no dependency on training data)
+- Demo mode replays saved data through detector (python detector.py --demo)
+- Designed to plug into Birdeye WebSocket listener
+- Created results/how_to_use.txt — plain English explanation of all alert fields, rules, accuracy, and limitations
+- Honest about limitations: 59% accuracy, no on-chain data, no social signals
+- Files: detector.py, results/how_to_use.txt
+
 ## Failed Approaches
 
 ### Nansen API (Phase 0)

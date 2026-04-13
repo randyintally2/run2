@@ -1,0 +1,148 @@
+HOW TO USE THE EARLY RUNNER DETECTOR
+=====================================
+
+WHAT IT DOES
+------------
+The detector watches a stream of 1-minute price/volume bars for a single
+Solana token. It maintains a rolling 30-minute window of "quiet" baseline
+data, then watches for a breakout — a sudden jump in both volume and price.
+
+Once a breakout is detected, it waits 15 minutes, computes five features
+about the breakout's character, and issues a WINNER or LOSER prediction.
+
+- WINNER means: the breakout pattern looks like tokens that went on to
+  gain 5x-800x from their quiet period price.
+- LOSER means: the pattern looks like tokens that spiked 1.5x-6x and
+  then crashed 70-100% back down.
+
+
+HOW TO RUN IT
+-------------
+1. Import the detector:
+     from detector import RunnerDetector
+     det = RunnerDetector(token_address="<token_mint_address>")
+
+2. Feed 1-minute OHLCV bars as they arrive:
+     alert = det.feed_bar({
+         "unix_time": 1234567890,
+         "o": 0.001,      # open price
+         "h": 0.0012,     # high price
+         "l": 0.0009,     # low price
+         "c": 0.0011,     # close price
+         "v": 50000       # volume in USD
+     })
+
+3. If alert is not None, a prediction has been made:
+     alert["prediction"]        # "winner" or "loser"
+     alert["total_score"]       # numeric score (-5 to +5)
+     alert["current_multiplier"] # how far price moved from baseline
+     alert["feature_details"]   # breakdown of each rule
+
+4. To plug into a Birdeye WebSocket:
+   - Subscribe to 1-minute candle updates for a token
+   - Convert each candle to the bar format above
+   - Feed into the detector
+   - Handle alerts as desired
+
+
+WHAT EACH ALERT FIELD MEANS
+----------------------------
+token_address:       The Solana mint address being monitored
+breakout_time:       Unix timestamp when the breakout was first detected
+current_price:       Price at the time of scoring (15 min after breakout)
+baseline_price:      Median price during the 30-minute quiet period before breakout
+current_multiplier:  current_price / baseline_price (e.g. 2.5x means 150% gain)
+total_score:         Sum of all rule scores (-5 to +5). Higher = more winner-like.
+prediction:          "winner" if score >= 0, "loser" if score < 0
+feature_details:     List of each rule with raw value, threshold, and +1/-1 score
+
+
+THE FIVE SCORING RULES
+----------------------
+Each rule adds +1 (winner-like) or -1 (loser-like) to the total score.
+
+1. PRICE MOVE FROM BASELINE (strongest signal, Cohen's d = 0.94)
+   Measures how far price has moved from the quiet period average.
+   Winners move further from baseline in the first 15 minutes.
+   Threshold: ln(1 + value) > 0.865 → score +1
+   In plain English: price above ~1.4x the baseline = good sign
+
+2. VOLUME RATIO (Cohen's d = 0.60)
+   Average breakout volume divided by baseline median volume.
+   Paradoxically, LOWER ratios favor winners. Pump-and-dumps blast volume
+   artificially; organic breakouts have more modest but sustained volume.
+   Threshold: ln(1 + value) < 1.601 → score +1
+   In plain English: volume under ~4x baseline = more likely organic
+
+3. VOLUME CONSISTENCY (Cohen's d = 0.51)
+   What fraction of the 15 breakout bars had volume above baseline median.
+   Lower consistency favors winners — organic buying is lumpy (some bars hot,
+   some cold), while pump bots maintain constant high volume.
+   Threshold: ln(1 + value) < 0.470 → score +1
+
+4. PRICE RETRACEMENT DEPTH (Cohen's d = 0.37)
+   The deepest pullback during the 15 minutes, as a fraction of the total move.
+   Shallower pullbacks favor winners — strong demand catches dips quickly.
+   Threshold: ln(1 + value) < 0.406 → score +1
+   In plain English: pullbacks under ~50% of the move = strong demand
+
+5. VOLUME STREAK (Cohen's d = 0.32)
+   Longest consecutive run of bars with volume above 2x baseline.
+   Shorter streaks favor winners — organic accumulation comes in waves,
+   not one sustained blast from a single bot/whale.
+   Threshold: ln(1 + value) < 1.386 → score +1
+
+
+SCORE THRESHOLD
+---------------
+Threshold: 0 (predict WINNER if score >= 0, LOSER if score < 0)
+
+This threshold was chosen to maximize the true positive rate (catching
+real winners) while keeping the false positive rate below 40%.
+
+
+EXPECTED ACCURACY
+-----------------
+Based on leave-one-out cross-validation on 81 historical tokens:
+
+  Accuracy:  59% (correctly classifies about 3 in 5 tokens)
+  Precision: 47% (when it says "winner", it's right about half the time)
+  Recall:    55% (it catches about half of actual winners)
+
+This is better than random (50%) but not a reliable standalone signal.
+It should be one input among several in a trading decision.
+
+
+WHAT THE DETECTOR CANNOT TELL YOU
+---------------------------------
+This detector uses ONLY price and volume data from the first 15 minutes.
+It has NO information about:
+
+1. ON-CHAIN RISK FACTORS
+   - Whether the liquidity pool is locked or can be pulled (rug risk)
+   - How concentrated token ownership is (whale dump risk)
+   - Whether the contract has mint authority still enabled
+   - Whether there are suspicious wallet patterns (wash trading)
+
+2. SOCIAL/SENTIMENT SIGNALS
+   - Twitter/Telegram mention velocity and sentiment
+   - Whether the pump is driven by a known influencer or KOL
+   - Whether there's an organic community or just bots
+
+3. TOKEN FUNDAMENTALS
+   - Age of the token and its trading history beyond 30 minutes
+   - Market cap and liquidity depth relative to volume
+   - Whether the token has been on exchanges or just on-chain
+
+4. BROADER MARKET CONTEXT
+   - Whether SOL or BTC is trending up or down
+   - Overall meme coin market sentiment
+   - Time of day / day of week effects
+
+IMPORTANT: A "WINNER" signal does NOT mean "buy this token." It means
+the early breakout pattern RESEMBLES tokens that historically went on
+to large gains. Many factors beyond price/volume determine whether a
+token is safe to trade or a potential rug pull.
+
+Always verify on-chain safety (RugCheck, Birdeye security score) before
+acting on any signal from this detector.
