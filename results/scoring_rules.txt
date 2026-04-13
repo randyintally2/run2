@@ -1,0 +1,44 @@
+EARLY RUNNER CLASSIFIER — SCORING RULES
+==================================================
+
+How it works:
+Each rule checks one feature of the token's first 15 minutes after breakout.
+If the feature value is on the 'winner side' of the threshold, score +1.
+If it's on the 'loser side', score -1.
+If the total score is 0 or higher, predict WINNER.
+
+Rules:
+--------------------------------------------------
+Rule 1: IF price_vs_baseline_range (log-transformed) is above 0.864617 THEN score +1 (else -1)
+  Cohen's d = 0.938
+  True Positive Rate = 0.68 (what % of actual winners this rule catches)
+  False Positive Rate = 0.40 (what % of losers this rule wrongly flags)
+  STRONG separation — winners higher
+
+Rule 2: IF vol_ratio_vs_baseline (log-transformed) is below 1.601410 THEN score +1 (else -1)
+  Cohen's d = -0.598
+  True Positive Rate = 0.65 (what % of actual winners this rule catches)
+  False Positive Rate = 0.38 (what % of losers this rule wrongly flags)
+  MEDIUM separation — losers higher
+
+Rule 3: IF vol_consistency (log-transformed) is below 0.470004 THEN score +1 (else -1)
+  Cohen's d = -0.514
+  True Positive Rate = 0.48 (what % of actual winners this rule catches)
+  False Positive Rate = 0.28 (what % of losers this rule wrongly flags)
+  MEDIUM separation — losers higher
+
+Rule 4: IF price_retracement_depth (log-transformed) is below 0.406471 THEN score +1 (else -1)
+  Cohen's d = -0.367
+  True Positive Rate = 0.65 (what % of actual winners this rule catches)
+  False Positive Rate = 0.38 (what % of losers this rule wrongly flags)
+  WEAK separation — losers higher
+
+Rule 5: IF vol_no_gap (log-transformed) is below 1.386294 THEN score +1 (else -1)
+  Cohen's d = -0.321
+  True Positive Rate = 0.58 (what % of actual winners this rule catches)
+  False Positive Rate = 0.38 (what % of losers this rule wrongly flags)
+  WEAK separation — losers higher
+
+
+Score threshold: 0
+Predict WINNER if total score >= 0

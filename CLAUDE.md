@@ -291,6 +291,15 @@ Also write results/how_to_use.txt explaining in plain English:
 - tx_count_vs_baseline is useless (both ~1.0) — OHLCV data doesn't capture unique buyers
 - Files: data/features.csv, phase2_features.py
 
+### Phase 3: Find the Decision Boundary — COMPLETE (2026-04-13)
+- Computed Cohen's d for all 12 features (raw and log-transformed)
+- Top feature: price_vs_baseline_range (d=0.938, STRONG) — winners move further from baseline in first 15 min
+- 5-rule scoring system using top features with score threshold >= 0
+- Accuracy: 67.9% (55/81 correct), Precision: 57.1%, Recall: 64.5%
+- Key insight: losers have HIGHER volume metrics (vol_ratio, vol_consistency) — pump-and-dumps spike volume artificially
+- Log-transformation critical for handling extreme outliers in volume features
+- Files: results/feature_separability.csv, results/scoring_rules.txt, results/confusion_matrix.txt, results/backtest_summary.txt, phase3_decision.py
+
 ## Failed Approaches
 
 ### Nansen API (Phase 0)

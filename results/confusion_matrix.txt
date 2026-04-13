@@ -1,0 +1,25 @@
+CONFUSION MATRIX
+==================================================
+
+What this table means:
+- True Positive (TP): We predicted winner and it WAS a winner — good!
+- False Positive (FP): We predicted winner but it was a loser — bad, we lose money
+- True Negative (TN): We predicted loser and it WAS a loser — good, we avoided a loss
+- False Negative (FN): We predicted loser but it was a winner — bad, we missed a gain
+
+                  Predicted Winner  Predicted Loser
+Actual Winner                   20               11
+Actual Loser                    15               35
+
+Accuracy:  67.90%
+  Out of 81 tokens, we got 55 right.
+
+Precision: 57.14%
+  When we said 'this is a winner', we were right 57% of the time.
+  This matters most — it's how often our BUY signal is correct.
+
+Recall: 64.52%
+  Of all 31 actual winners, we caught 20.
+  Missing some winners is OK; wrongly buying losers is expensive.
+
+Score threshold used: 0
